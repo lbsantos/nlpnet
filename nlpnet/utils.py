@@ -14,7 +14,7 @@ from nltk.tokenize.regexp import RegexpTokenizer
 from nltk.tokenize import TreebankWordTokenizer
 from . import attributes
 
-_tokenizer_regexp = ur'''(?ux)
+_tokenizer_regexp = r'''(?ux)
     # the order of the patterns is important!!
     ([^\W\d_]\.)+|                # one letter abbreviations, e.g. E.U.A.
     \d{1,3}(\.\d{3})*(,\d+)|      # numbers in format 999.999.999,99999
@@ -56,8 +56,8 @@ def tokenize(text, language):
     
     :param language: two letter code (en, pt)
     """
-    if not isinstance(text, unicode):
-        text = unicode(text, 'utf-8')
+    if not isinstance(text, str):
+        text = str(text, 'utf-8')
     
     if language == 'en':
         return tokenize_en(text)
@@ -103,9 +103,9 @@ def clean_text(text, correct=True):
     """    
     # replaces different kinds of quotation marks with "
     # take care not to remove apostrophes
-    text = re.sub(ur"(?u)(^|\W)[‘’′`']", r'\1"', text)
-    text = re.sub(ur"(?u)[‘’`′'](\W|$)", r'"\1', text)
-    text = re.sub(ur'(?u)[«»“”]', '"', text)
+    text = re.sub(r"(?u)(^|\W)[‘’′`']", r'\1"', text)
+    text = re.sub(r"(?u)[‘’`′'](\W|$)", r'"\1', text)
+    text = re.sub(r'(?u)[«»“”]', '"', text)
     
     if correct:
         # tries to fix mistyped tokens (common in Wikipedia-pt) as ,, '' ..
@@ -120,13 +120,13 @@ def clean_text(text, correct=True):
     text = re.sub(r'\d', '9', text)
     
     # replaces special ellipsis character 
-    text = text.replace(u'…', '...')
+    text = text.replace('…', '...')
     
     return text
 
 
 
-_contractible_base = ur'''(?iux)
+_contractible_base = r'''(?iux)
     (
     [ao]s?|                # definite articles
     um(as?)?|uns|          # indefinite articles
@@ -139,7 +139,7 @@ _contractible_base = ur'''(?iux)
     )
     $
     '''
-_contractible_de = re.compile(_contractible_base % u'|aqui|aí|ali|entre')
+_contractible_de = re.compile(_contractible_base % '|aqui|aí|ali|entre')
 _contractible_em = re.compile(_contractible_base % '')
 _contractible_art = re.compile('[oa]s?')
 
@@ -166,7 +166,7 @@ def contract(w1, w2):
         if w2 in ['o', 'os']:
             contraction = 'a' + w2
         elif w2.startswith('a'):
-            contraction = u'à' + w2[1:]
+            contraction = 'à' + w2[1:]
     elif w1 == 'para' and _contractible_art.match(w2):
         contraction = 'pr' + w2
     elif w1 == 'com':
@@ -176,9 +176,9 @@ def contract(w1, w2):
             contraction = 'contigo'
         elif w2 == 'si':
             contraction = 'consigo'
-        elif w2 == u'nós':
+        elif w2 == 'nós':
             contraction = 'conosco'
-        elif w2 == u'vós':
+        elif w2 == 'vós':
             contraction = 'convosco'
     elif w1 == 'lhe' and _contractible_art.match(w2):
         contraction = 'lh' + w2
@@ -342,7 +342,7 @@ def make_contractions_srl(sentences, predicates):
     :returns: a tuple (sentences, predicates) after contractions have been made.
     """
     def_articles = ['a', 'as', 'o', 'os']
-    adverbs = [u'aí', 'aqui', 'ali']
+    adverbs = ['aí', 'aqui', 'ali']
     pronouns = ['ele', 'eles', 'ela', 'elas', 'esse', 'esses', 
                 'essa', 'essas', 'isso', 'este', 'estes', 'esta',
                 'estas', 'isto', ]
@@ -390,16 +390,16 @@ def make_contractions_srl(sentences, predicates):
                 
                 elif word == 'a':
                     if next_word in pronouns_a:
-                        contract(u'à' + next_word[1:], u'à' + next_token.lemma[1:])
+                        contract('à' + next_word[1:], 'à' + next_token.lemma[1:])
                     
                     elif next_word in ['o', 'os']:
                         contract('a' + next_word, 'ao')
                     
                     elif next_word == 'a':
-                        contract(u'à', 'ao')
+                        contract('à', 'ao')
                     
                     elif next_word == 'as':
-                        contract(u'às', 'ao')
+                        contract('às', 'ao')
     
     return (sentences, predicates)
 

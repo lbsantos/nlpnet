@@ -52,7 +52,7 @@ class POSReader(TaggerReader):
         self.sentences = []
         with open(filename, 'rb') as f:
             for line in f:
-                line = unicode(line, 'utf-8')
+                line = str(line, 'utf-8')
                 items = line.split()
                 sentence = []
                 for item in items:
@@ -77,7 +77,7 @@ class POSReader(TaggerReader):
                         sentence = []
                         continue
                 
-                line = unicode(line, 'utf-8')
+                line = str(line, 'utf-8')
                 fields = line.split()
                 word = fields[ConllPos.word]
                 pos = fields[ConllPos.pos]
